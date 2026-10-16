@@ -1,59 +1,85 @@
-name: Terraform Azure POC
+name: Terraform
 
+# Runs on every push to main, or manually from the Actions tab.
+# (No pull_request trigger: the Branch federated credential only matches main.)
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+# Nothing gets write access by default; each job asks for what it needs.
 permissions:
-  id-token: write   # needed for OIDC login to Azure
   contents: read
 
+# Only one run at a time, so two runs never fight over the state lock.
+concurrency:
+  group: terraform
+  cancel-in-progress: false
+
 env:
-  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  ARM_USE_OIDC: true
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
 
 jobs:
+  # ---------------------------------------------------------------
+  # 1. Checks: format, validate, security scan. No Azure login at all.
+  # ---------------------------------------------------------------
   checks:
-    name: Format, validate, security scan
+    name: Checks (fmt, validate, Checkov)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: hashicorp/setup-terraform@v3
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.15.8 # change to match `terraform version` on your PC
+          terraform_wrapper: false
 
-      - name: Terraform format check
+      - name: Terraform fmt
         run: terraform fmt -check -recursive
 
-      - name: Terraform init
+      - name: Terraform init (no backend)
         run: terraform init -backend=false
 
       - name: Terraform validate
         run: terraform validate
 
-      - name: Security scan (Checkov)
+      - name: Checkov security scan
         uses: bridgecrewio/checkov-action@v12
         with:
           directory: .
           framework: terraform
-          soft_fail: true   # report findings without failing the run while the POC is new
+          soft_fail: true # report findings, don't block (tighten later)
 
+  # ---------------------------------------------------------------
+  # 2. Plan: logs in to Azure via OIDC (Branch credential: main).
+  #    No environment, so no approval needed.
+  # ---------------------------------------------------------------
   plan:
     name: Terraform plan
     needs: checks
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write # lets this job request the OIDC token
+      contents: read
+    env:
+      ARM_USE_OIDC: "true"
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: hashicorp/setup-terraform@v3
-
-      - uses: azure/login@v2
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          terraform_version: 1.15.8
+          terraform_wrapper: false
 
       - name: Terraform init
         run: terraform init
@@ -61,32 +87,48 @@ jobs:
       - name: Terraform plan
         run: terraform plan -out=tfplan
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload plan
+        uses: actions/upload-artifact@v4
         with:
           name: tfplan
           path: tfplan
+          retention-days: 7
 
+  # ---------------------------------------------------------------
+  # 3. Apply: waits for your approval (required reviewer on the
+  #    "azure" environment), then applies the exact plan from job 2.
+  #    Logs in via the Environment credential: azure.
+  # ---------------------------------------------------------------
   apply:
-    name: Terraform apply (approval required)
+    name: Terraform apply
     needs: plan
     runs-on: ubuntu-latest
-    environment: azure   # pauses here until you approve in GitHub
+    environment: azure
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      ARM_USE_OIDC: "true"
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: hashicorp/setup-terraform@v3
-
-      - uses: azure/login@v2
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          terraform_version: 1.15.8
+          terraform_wrapper: false
+
+      - name: Download plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
 
       - name: Terraform init
         run: terraform init
 
-      - name: Terraform plan (fresh, for the apply environment)
-        run: terraform plan -out=tfplan
-
       - name: Terraform apply
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply tfplan
