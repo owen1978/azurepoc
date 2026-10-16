@@ -1,0 +1,14 @@
+# Terraform state and local variables (can contain sensitive values)
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl.bak
+*.tfvars
+crash.log
+crash.*.log
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
