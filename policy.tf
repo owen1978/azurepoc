@@ -1,8 +1,9 @@
 resource "azurerm_policy_definition" "require_rg_tags" {
-  name         = "azurepoc-require-rg-tags"
-  policy_type  = "Custom"
-  mode         = "All"
-  display_name = "Require tags and values on resource groups"
+  name                = "azurepoc-require-rg-tags"
+  management_group_id = data.azurerm_management_group.azurepoc.id
+  policy_type         = "Custom"
+  mode                = "All"
+  display_name        = "Require tags and values on resource groups"
 
   metadata = jsonencode({ category = "Tags" })
 
@@ -42,10 +43,11 @@ resource "azurerm_policy_definition" "require_rg_tags" {
 }
 
 resource "azurerm_policy_definition" "subnet_requires_nsg" {
-  name         = "azurepoc-subnet-requires-nsg"
-  policy_type  = "Custom"
-  mode         = "All"
-  display_name = "Subnets should have a network security group"
+  name                = "azurepoc-subnet-requires-nsg"
+  management_group_id = data.azurerm_management_group.azurepoc.id
+  policy_type         = "Custom"
+  mode                = "All"
+  display_name        = "Subnets should have a network security group"
 
   metadata = jsonencode({ category = "Network" })
 
@@ -70,9 +72,10 @@ resource "azurerm_policy_definition" "subnet_requires_nsg" {
 }
 
 resource "azurerm_policy_set_definition" "initiative" {
-  name         = "azurepoc_policy"
-  policy_type  = "Custom"
-  display_name = "azurepoc_policy"
+  name                = "azurepoc_policy"
+  management_group_id = data.azurerm_management_group.azurepoc.id
+  policy_type         = "Custom"
+  display_name        = "azurepoc_policy"
 
   parameters = jsonencode({
     allowedLocations = {
