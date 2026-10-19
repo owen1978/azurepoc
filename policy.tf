@@ -71,7 +71,7 @@ resource "azurerm_policy_definition" "subnet_requires_nsg" {
   })
 }
 
-resource "azurerm_policy_set_definition" "initiative" {
+resource "azurerm_management_group_policy_set_definition" "initiative" {
   name                = "azurepoc_policy"
   management_group_id = data.azurerm_management_group.azurepoc.id
   policy_type         = "Custom"
@@ -130,5 +130,5 @@ resource "azurerm_management_group_policy_assignment" "azurepoc" {
   name                 = "azurepoc-policy"
   display_name         = "azurepoc_policy"
   management_group_id  = data.azurerm_management_group.azurepoc.id
-  policy_definition_id = azurerm_policy_set_definition.initiative.id
+  policy_definition_id = azurerm_management_group_policy_set_definition.initiative.id
 }
