@@ -61,14 +61,14 @@ resource "azurerm_subnet" "testsub" {
 }
 
 resource "azurerm_subnet" "vpnsub" {
-  name                 = "sub-vpn-connectivity-uks-01"
-  resource_group_name  = azurerm_resource_group.hubvpn.name
+  name                 = "GatewaySubnet"
+  resource_group_name  = azurerm_resource_group.hubvnet.name
   virtual_network_name = azurerm_virtual_network.hubvnet.name
   address_prefixes     = ["10.200.0.0/27"]
 }
 
 resource "azurerm_subnet" "azfwsub" {
-  name                 = "sub-azfw-connectivity-uks-01"
+  name                 = "AzureFirewallSubnet"
   resource_group_name  = azurerm_resource_group.hubvnet.name
   virtual_network_name = azurerm_virtual_network.hubvnet.name
   address_prefixes     = ["10.200.1.0/26"]
