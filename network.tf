@@ -79,8 +79,8 @@ resource "azurerm_virtual_network_peering" "peeropstohub" {
   resource_group_name          = azurerm_resource_group.opspoke.name
   virtual_network_name         = azurerm_virtual_network.opsvnet.name
   remote_virtual_network_id    = azurerm_virtual_network.hubvnet.id
-  allow_virtual_network_access = "true"
-  use_remote_gateways          = "true"
+  allow_virtual_network_access = true
+  #use_remote_gateways          = true
 }
 
 resource "azurerm_virtual_network_peering" "peerhubtoops" {
@@ -88,8 +88,9 @@ resource "azurerm_virtual_network_peering" "peerhubtoops" {
   resource_group_name          = azurerm_resource_group.hubvnet.name
   virtual_network_name         = azurerm_virtual_network.hubvnet.name
   remote_virtual_network_id    = azurerm_virtual_network.opsvnet.id
-  allow_virtual_network_access = "true"
-  allow_gateway_transit        = "true"
+  allow_virtual_network_access = true
+  #allow_gateway_transit        = true
+  allow_forwarded_traffic = true
 }
 
 resource "azurerm_virtual_network_peering" "peerprdtohub" {
@@ -97,8 +98,8 @@ resource "azurerm_virtual_network_peering" "peerprdtohub" {
   resource_group_name          = azurerm_resource_group.prdspoke.name
   virtual_network_name         = azurerm_virtual_network.prdvnet.name
   remote_virtual_network_id    = azurerm_virtual_network.hubvnet.id
-  allow_virtual_network_access = "true"
-  use_remote_gateways          = "true"
+  allow_virtual_network_access = true
+  #use_remote_gateways          = true
 }
 
 resource "azurerm_virtual_network_peering" "peerhubtoprd" {
@@ -106,8 +107,9 @@ resource "azurerm_virtual_network_peering" "peerhubtoprd" {
   resource_group_name          = azurerm_resource_group.hubvnet.name
   virtual_network_name         = azurerm_virtual_network.hubvnet.name
   remote_virtual_network_id    = azurerm_virtual_network.prdvnet.id
-  allow_virtual_network_access = "true"
-  allow_gateway_transit        = "true"
+  allow_virtual_network_access = true
+  #allow_gateway_transit        = true
+  #allow_forwarded_traffic = true
 }
 
 resource "azurerm_virtual_network_peering" "peeropstoprd" {
@@ -115,7 +117,7 @@ resource "azurerm_virtual_network_peering" "peeropstoprd" {
   resource_group_name          = azurerm_resource_group.opspoke.name
   virtual_network_name         = azurerm_virtual_network.opsvnet.name
   remote_virtual_network_id    = azurerm_virtual_network.prdvnet.id
-  allow_virtual_network_access = "true"
+  allow_virtual_network_access = true
 }
 
 resource "azurerm_virtual_network_peering" "peerprdtoops" {
@@ -123,5 +125,5 @@ resource "azurerm_virtual_network_peering" "peerprdtoops" {
   resource_group_name          = azurerm_resource_group.prdspoke.name
   virtual_network_name         = azurerm_virtual_network.prdvnet.name
   remote_virtual_network_id    = azurerm_virtual_network.opsvnet.id
-  allow_virtual_network_access = "true"
+  allow_virtual_network_access = true
 }
