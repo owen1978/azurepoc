@@ -73,3 +73,55 @@ resource "azurerm_subnet" "azfwsub" {
   virtual_network_name = azurerm_virtual_network.hubvnet.name
   address_prefixes     = ["10.200.1.0/26"]
 }
+
+resource "azurerm_virtual_network_peering" "peeropstohub" {
+  name                         = "peering-ops-to-hub"
+  resource_group_name          = azurerm_resource_group.opspoke.name
+  virtual_network_name         = azurerm_virtual_network.opsvnet.name
+  remote_virtual_network_id    = azurerm_virtual_network.hubvnet.id
+  allow_virtual_network_access = "true"
+  use_remote_gateways          = "true"
+}
+
+resource "azurerm_virtual_network_peering" "peerhubtoops" {
+  name                         = "peering-hub-to-ops"
+  resource_group_name          = azurerm_resource_group.hubvnet.name
+  virtual_network_name         = azurerm_virtual_network.hubvnet.name
+  remote_virtual_network_id    = azurerm_virtual_network.opsvnet.id
+  allow_virtual_network_access = "true"
+  allow_gateway_transit        = "true"
+}
+
+resource "azurerm_virtual_network_peering" "peerprdtohub" {
+  name                         = "peering-prd-to-hub"
+  resource_group_name          = azurerm_resource_group.prdspoke.name
+  virtual_network_name         = azurerm_virtual_network.prdvnet.name
+  remote_virtual_network_id    = azurerm_virtual_network.hubvnet.id
+  allow_virtual_network_access = "true"
+  use_remote_gateways          = "true"
+}
+
+resource "azurerm_virtual_network_peering" "peerhubtoprd" {
+  name                         = "peering-hub-to-prd"
+  resource_group_name          = azurerm_resource_group.hubvnet.name
+  virtual_network_name         = azurerm_virtual_network.hubvnet.name
+  remote_virtual_network_id    = azurerm_virtual_network.prdvnet.id
+  allow_virtual_network_access = "true"
+  allow_gateway_transit        = "true"
+}
+
+resource "azurerm_virtual_network_peering" "peeropstoprd" {
+  name                         = "peering-ops-to-prd"
+  resource_group_name          = azurerm_resource_group.opspoke.name
+  virtual_network_name         = azurerm_virtual_network.opsvnet.name
+  remote_virtual_network_id    = azurerm_virtual_network.prdvnet.id
+  allow_virtual_network_access = "true"
+}
+
+resource "azurerm_virtual_network_peering" "peerprdtoops" {
+  name                         = "peering-prd-to-ops"
+  resource_group_name          = azurerm_resource_group.prdspoke.name
+  virtual_network_name         = azurerm_virtual_network.prdvnet.name
+  remote_virtual_network_id    = azurerm_virtual_network.opsvnet.id
+  allow_virtual_network_access = "true"
+}
