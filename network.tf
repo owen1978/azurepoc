@@ -90,7 +90,7 @@ resource "azurerm_virtual_network_peering" "peerhubtoops" {
   remote_virtual_network_id    = azurerm_virtual_network.opsvnet.id
   allow_virtual_network_access = true
   #allow_gateway_transit        = true
-  allow_forwarded_traffic = true
+  #allow_forwarded_traffic = true
 }
 
 resource "azurerm_virtual_network_peering" "peerprdtohub" {
