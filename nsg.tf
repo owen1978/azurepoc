@@ -1,6 +1,6 @@
 resource "azurerm_network_security_group" "sandbox" {
   name                = "nsg-production-sandbox-uks-01"
-  location            = azurerm_resource_group.prdvnet.location
+  location            = azurerm_resource_group.prdspoke.location
   resource_group_name = azurerm_resource_group.prdspoke.name
 
   security_rule {
@@ -131,7 +131,7 @@ resource "azurerm_subnet_network_security_group_association" "sandboxsubnet" {
 
 resource "azurerm_network_security_group" "identity" {
   name                = "nsg-operations-domain-uks-01"
-  location            = azurerm_resource_group.opsvnet.location
+  location            = azurerm_resource_group.opspoke.location
   resource_group_name = azurerm_resource_group.opspoke.name
 
   security_rule {
