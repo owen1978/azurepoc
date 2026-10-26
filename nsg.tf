@@ -1,7 +1,7 @@
 resource "azurerm_network_security_group" "sandbox" {
   name                = "nsg-production-sandbox-uks-01"
-  location            = azurerm_resource_group.hubvnet.location
-  resource_group_name = azurerm_resource_group.hubvnet.name
+  location            = azurerm_resource_group.prdvnet.location
+  resource_group_name = azurerm_resource_group.prdspoke.name
 
   security_rule {
     name                       = "inbound_jumpbox_tcp"
@@ -131,8 +131,8 @@ resource "azurerm_subnet_network_security_group_association" "sandboxsubnet" {
 
 resource "azurerm_network_security_group" "identity" {
   name                = "nsg-operations-domain-uks-01"
-  location            = azurerm_resource_group.hubvnet.location
-  resource_group_name = azurerm_resource_group.hubvnet.name
+  location            = azurerm_resource_group.opsvnet.location
+  resource_group_name = azurerm_resource_group.opspoke.name
 
   security_rule {
     name                       = "inbound_jumpbox_tcp"
