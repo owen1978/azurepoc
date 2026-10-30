@@ -1,4 +1,6 @@
 resource "azurerm_network_security_group" "sandbox" {
+  provider = azurerm.production
+
   name                = "nsg-production-sandbox-uks-01"
   location            = azurerm_resource_group.prdspoke.location
   resource_group_name = azurerm_resource_group.prdspoke.name
@@ -125,11 +127,15 @@ resource "azurerm_network_security_group" "sandbox" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "sandboxsubnet" {
+  provider = azurerm.production
+
   subnet_id                 = azurerm_subnet.testsub.id
   network_security_group_id = azurerm_network_security_group.sandbox.id
 }
 
 resource "azurerm_network_security_group" "identity" {
+  provider = azurerm.operations
+
   name                = "nsg-operations-domain-uks-01"
   location            = azurerm_resource_group.opspoke.location
   resource_group_name = azurerm_resource_group.opspoke.name
@@ -280,6 +286,8 @@ resource "azurerm_network_security_group" "identity" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "identitysubnet" {
+  provider = azurerm.operations
+
   subnet_id                 = azurerm_subnet.identitysub.id
   network_security_group_id = azurerm_network_security_group.identity.id
 }

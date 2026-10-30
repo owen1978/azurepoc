@@ -1,24 +1,34 @@
 resource "azurerm_resource_group" "hubvnet" {
+  provider = azurerm.connectivity
+
   name     = "rg-vnet-connectivity-uks-01"
   location = "uksouth"
 }
 
 resource "azurerm_resource_group" "opspoke" {
+  provider = azurerm.operations
+
   name     = "rg-vnet-operations-uks-01"
   location = "uksouth"
 }
 
 resource "azurerm_resource_group" "prdspoke" {
+  provider = azurerm.production
+
   name     = "rg-vnet-production-uks-01"
   location = "uksouth"
 }
 
 resource "azurerm_resource_group" "hubvpn" {
+  provider = azurerm.connectivity
+
   name     = "rg-vpn-connectivity-uks-01"
   location = "uksouth"
 }
 
 resource "azurerm_virtual_network" "opsvnet" {
+  provider = azurerm.operations
+
   name                = "vnet-operations-uks-01"
   location            = azurerm_resource_group.opspoke.location
   resource_group_name = azurerm_resource_group.opspoke.name
@@ -26,6 +36,8 @@ resource "azurerm_virtual_network" "opsvnet" {
 }
 
 resource "azurerm_virtual_network" "prdvnet" {
+  provider = azurerm.production
+
   name                = "vnet-production-uks-01"
   location            = azurerm_resource_group.prdspoke.location
   resource_group_name = azurerm_resource_group.prdspoke.name
@@ -33,6 +45,8 @@ resource "azurerm_virtual_network" "prdvnet" {
 }
 
 resource "azurerm_virtual_network" "hubvnet" {
+  provider = azurerm.connectivity
+
   name                = "vnet-connectivity-uks-01"
   location            = azurerm_resource_group.hubvnet.location
   resource_group_name = azurerm_resource_group.hubvnet.name
@@ -40,6 +54,8 @@ resource "azurerm_virtual_network" "hubvnet" {
 }
 
 resource "azurerm_subnet" "identitysub" {
+  provider = azurerm.operations
+
   name                 = "sub-identity-operations-uks-01"
   resource_group_name  = azurerm_resource_group.opspoke.name
   virtual_network_name = azurerm_virtual_network.opsvnet.name
@@ -47,6 +63,8 @@ resource "azurerm_subnet" "identitysub" {
 }
 
 resource "azurerm_subnet" "monitorsub" {
+  provider = azurerm.operations
+
   name                 = "sub-monitor-operations-uks-01"
   resource_group_name  = azurerm_resource_group.opspoke.name
   virtual_network_name = azurerm_virtual_network.opsvnet.name
@@ -54,6 +72,8 @@ resource "azurerm_subnet" "monitorsub" {
 }
 
 resource "azurerm_subnet" "testsub" {
+  provider = azurerm.production
+
   name                 = "sub-testing-production-uks-01"
   resource_group_name  = azurerm_resource_group.prdspoke.name
   virtual_network_name = azurerm_virtual_network.prdvnet.name
@@ -61,6 +81,8 @@ resource "azurerm_subnet" "testsub" {
 }
 
 resource "azurerm_subnet" "vpnsub" {
+  provider = azurerm.connectivity
+
   name                 = "GatewaySubnet"
   resource_group_name  = azurerm_resource_group.hubvnet.name
   virtual_network_name = azurerm_virtual_network.hubvnet.name
@@ -68,6 +90,8 @@ resource "azurerm_subnet" "vpnsub" {
 }
 
 resource "azurerm_subnet" "azfwsub" {
+  provider = azurerm.connectivity
+
   name                 = "AzureFirewallSubnet"
   resource_group_name  = azurerm_resource_group.hubvnet.name
   virtual_network_name = azurerm_virtual_network.hubvnet.name
@@ -75,6 +99,8 @@ resource "azurerm_subnet" "azfwsub" {
 }
 
 resource "azurerm_virtual_network_peering" "peeropstohub" {
+  provider = azurerm.operations
+
   name                         = "peering-ops-to-hub"
   resource_group_name          = azurerm_resource_group.opspoke.name
   virtual_network_name         = azurerm_virtual_network.opsvnet.name
@@ -84,6 +110,8 @@ resource "azurerm_virtual_network_peering" "peeropstohub" {
 }
 
 resource "azurerm_virtual_network_peering" "peerhubtoops" {
+  provider = azurerm.connectivity
+
   name                         = "peering-hub-to-ops"
   resource_group_name          = azurerm_resource_group.hubvnet.name
   virtual_network_name         = azurerm_virtual_network.hubvnet.name
@@ -94,6 +122,8 @@ resource "azurerm_virtual_network_peering" "peerhubtoops" {
 }
 
 resource "azurerm_virtual_network_peering" "peerprdtohub" {
+  provider = azurerm.production
+
   name                         = "peering-prd-to-hub"
   resource_group_name          = azurerm_resource_group.prdspoke.name
   virtual_network_name         = azurerm_virtual_network.prdvnet.name
@@ -103,6 +133,8 @@ resource "azurerm_virtual_network_peering" "peerprdtohub" {
 }
 
 resource "azurerm_virtual_network_peering" "peerhubtoprd" {
+  provider = azurerm.connectivity
+
   name                         = "peering-hub-to-prd"
   resource_group_name          = azurerm_resource_group.hubvnet.name
   virtual_network_name         = azurerm_virtual_network.hubvnet.name
@@ -113,6 +145,8 @@ resource "azurerm_virtual_network_peering" "peerhubtoprd" {
 }
 
 resource "azurerm_virtual_network_peering" "peeropstoprd" {
+  provider = azurerm.operations
+
   name                         = "peering-ops-to-prd"
   resource_group_name          = azurerm_resource_group.opspoke.name
   virtual_network_name         = azurerm_virtual_network.opsvnet.name
@@ -121,6 +155,8 @@ resource "azurerm_virtual_network_peering" "peeropstoprd" {
 }
 
 resource "azurerm_virtual_network_peering" "peerprdtoops" {
+  provider = azurerm.production
+
   name                         = "peering-prd-to-ops"
   resource_group_name          = azurerm_resource_group.prdspoke.name
   virtual_network_name         = azurerm_virtual_network.prdvnet.name

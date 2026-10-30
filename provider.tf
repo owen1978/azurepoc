@@ -19,3 +19,21 @@ terraform {
 provider "azurerm" {
   features {}
 }
+
+provider "azurerm" {
+  alias           = "operations"
+  subscription_id = local.subscription_ids_by_name["azurepoc-operations"]
+  features {}
+}
+
+provider "azurerm" {
+  alias           = "connectivity"
+  subscription_id = local.subscription_ids_by_name["azurepoc-connectivity"]
+  features {}
+}
+
+provider "azurerm" {
+  alias           = "production"
+  subscription_id = local.subscription_ids_by_name["azurepoc-production"]
+  features {}
+}
