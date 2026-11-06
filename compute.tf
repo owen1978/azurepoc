@@ -27,6 +27,7 @@ resource "azurerm_network_interface" "dcnic" {
 resource "azurerm_windows_virtual_machine" "dcvm" {
   provider            = azurerm.operations
   name                = "vm-dc01-ops-uks-01"
+  computer_name       = "dc01"
   resource_group_name = azurerm_resource_group.dcvmrg.name
   location            = azurerm_resource_group.dcvmrg.location
   size                = "Standard_B2s_v2"
@@ -68,6 +69,7 @@ resource "azurerm_network_interface" "testnic" {
 resource "azurerm_windows_virtual_machine" "testvm" {
   provider            = azurerm.production
   name                = "vm-test-prd-uks-01"
+  computer_name       = "test01"
   resource_group_name = azurerm_resource_group.testvmrg.name
   location            = azurerm_resource_group.testvmrg.location
   size                = "Standard_B2s_v2"
