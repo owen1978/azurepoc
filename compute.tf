@@ -32,7 +32,7 @@ resource "azurerm_windows_virtual_machine" "dcvm" {
   location            = azurerm_resource_group.dcvmrg.location
   size                = "Standard_B2s_v2"
   admin_username      = "dcadmin"
-  admin_password      = random_password.dc_admin.result
+  admin_password      = data.azurerm_key_vault_secret.dc_admin.value
   network_interface_ids = [
     azurerm_network_interface.dcnic.id,
   ]
@@ -74,7 +74,7 @@ resource "azurerm_windows_virtual_machine" "testvm" {
   location            = azurerm_resource_group.testvmrg.location
   size                = "Standard_B2s_v2"
   admin_username      = "vmadmin"
-  admin_password      = random_password.test_admin.result
+  admin_password      = data.azurerm_key_vault_secret.test_admin.value
   network_interface_ids = [
     azurerm_network_interface.testnic.id,
   ]
