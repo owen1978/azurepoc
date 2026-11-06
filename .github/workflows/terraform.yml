@@ -1,4 +1,4 @@
-name: Terraform
+name: Virtual Machine
 
 # Runs on every push to main, or manually from the Actions tab.
 # (No pull_request trigger: the Branch federated credential only matches main.)
